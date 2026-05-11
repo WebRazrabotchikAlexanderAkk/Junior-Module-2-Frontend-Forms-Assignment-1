@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import * as yup from 'yup';
 import './App.css';
 
 function App() {
@@ -12,14 +13,17 @@ function App() {
 	});
 	const buttonRef = useRef(null);
 
+	const emailSchema = yup
+		.string()
+		.email('Неверный формат email')
+		.required('Email обязательное поле');
+
 	function validateEmail(value) {
-		if (!value) setError({ ...error, email: 'Email обязательное поле' });
-		else if (!value.includes('@'))
-			setError({ ...error, email: 'Email должен содержать символ @' });
-		else if (!/\S+@\S+\.\S+/.test(value))
-			setError({ ...error, email: 'Неверный формат email' });
-		else {
+		try {
+			emailSchema.validateSync(value);
 			setError({ ...error, email: '' });
+		} catch (err) {
+			setError({ ...error, email: err.message });
 		}
 	}
 
